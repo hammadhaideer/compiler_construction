@@ -4,14 +4,13 @@ Welcome to the repository for the CSC441 - Compiler Construction course. This re
 ## Repository Contents:
 
 ### Lab Tasks: Detailed implementations for lab activities.
-### Course Resources: Lecture notes, references, and materials.
 
 ## Lab Activities:
 
-### Lexical Analysis: Understanding token generation and symbol tables.
-### Syntax Analysis: Parsing techniques and grammar validation.
-### Semantic Analysis: Type checking and intermediate code generation.
-### Code Optimization: Implementing basic optimization strategies.
+#### Lexical Analysis: Understanding token generation and symbol tables.
+#### Syntax Analysis: Parsing techniques and grammar validation.
+#### Semantic Analysis: Type checking and intermediate code generation.
+#### Code Optimization: Implementing basic optimization strategies.
 
 ## How to Use:
 
