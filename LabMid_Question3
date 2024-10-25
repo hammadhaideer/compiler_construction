@@ -1,0 +1,48 @@
+using System;
+using System.Collections.Generic;
+
+namespace ToyCarController
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            HashSet<string> validCommands = new HashSet<string>
+            {
+                "start",
+                "stop",
+                "accelerate",
+                "brake",
+                "right"
+            };
+
+            Console.WriteLine("Enter a command for the toy car (start, stop, accelerate, brake, right):");
+            string input = Console.ReadLine()?.ToLower();
+
+            if (IsValidCommand(input, validCommands))
+            {
+                Console.WriteLine($"Command '{input}' is valid.");
+                // Here you can add the logic to execute the command
+            }
+            else
+            {
+                Console.WriteLine($"Command '{input}' is invalid. Please check your input.");
+            }
+        }
+
+        static bool IsValidCommand(string command, HashSet<string> validCommands)
+        {
+            if (string.IsNullOrWhiteSpace(command))
+                return false;
+
+            string[] parts = command.Split(' ');
+            foreach (var part in parts)
+            {
+                if (!validCommands.Contains(part) && part != "right")
+                    return false;
+            }
+
+            return true;
+        }
+    }
+}
