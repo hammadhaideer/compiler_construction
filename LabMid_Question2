@@ -1,0 +1,63 @@
+using System;
+using System.Text;
+using System.Text.RegularExpressions;
+
+namespace PasswordGenerator
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            string registrationNumber = "21";
+            string firstName = "Hammad";
+            string lastName = "Haider";
+            string favoriteMovie = "Inception";
+
+            string password = GeneratePassword(registrationNumber, firstName, lastName, favoriteMovie);
+            Console.WriteLine("Generated Password: " + password);
+        }
+
+        static string GeneratePassword(string regNumber, string firstName, string lastName, string favoriteMovie)
+        {
+            string firstInitial = firstName.Length >= 2 ? firstName[1].ToString() : "";
+            string lastInitial = lastName.Length >= 2 ? lastName[1].ToString() : "";
+            string moviePart = favoriteMovie.Length >= 2 ? favoriteMovie.Substring(0, 2) : "";
+            string specialChars = "!@$%^&*()-_=+<>?";
+
+            StringBuilder passwordBuilder = new StringBuilder();
+            passwordBuilder.Append(regNumber);
+            passwordBuilder.Append(firstInitial);
+            passwordBuilder.Append(lastInitial);
+            passwordBuilder.Append(moviePart);
+
+            Random random = new Random();
+            while (passwordBuilder.Length < 12)
+            {
+                passwordBuilder.Append((char)('a' + random.Next(0, 26)));
+            }
+            passwordBuilder.Append(specialChars[random.Next(specialChars.Length)]);
+            passwordBuilder.Append(specialChars[random.Next(specialChars.Length)]);
+
+            string password = Shuffle(passwordBuilder.ToString());
+
+            Regex regex = new Regex(@"^(?=.*\d{2})(?=.*[^\w#]).{14}$");
+            if (regex.IsMatch(password))
+                return password;
+
+            return GeneratePassword(regNumber, firstName, lastName, favoriteMovie);
+        }
+
+        static string Shuffle(string input)
+        {
+            char[] array = input.ToCharArray();
+            Random random = new Random();
+            int n = array.Length;
+            for (int i = n - 1; i > 0; i--)
+            {
+                int j = random.Next(i + 1);
+                (array[i], array[j]) = (array[j], array[i]);
+            }
+            return new string(array);
+        }
+    }
+}
