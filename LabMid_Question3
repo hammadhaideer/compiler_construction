@@ -3,46 +3,125 @@ using System.Collections.Generic;
 
 namespace ToyCarController
 {
+    // Define the states for the Toy Car
+    public enum ToyCarState
+    {
+        Off,
+        Running,
+        Accelerating,
+        Braking,
+        Stopped
+    }
+
     class Program
     {
         static void Main(string[] args)
         {
+            // Define valid commands
             HashSet<string> validCommands = new HashSet<string>
             {
                 "start",
                 "stop",
                 "accelerate",
                 "brake",
-                "right"
+                "left",
+                "right",
+                "forward",
+                "backward"
             };
 
-            Console.WriteLine("Enter a command for the toy car (start, stop, accelerate, brake, right):");
-            string input = Console.ReadLine()?.ToLower();
+            ToyCarState currentState = ToyCarState.Off; // Initial state
 
-            if (IsValidCommand(input, validCommands))
+            Console.WriteLine("Enter a command for the toy car (e.g., Start Right). Type 'Exit' to quit.");
+
+            while (true)
             {
-                Console.WriteLine($"Command '{input}' is valid.");
-                // Here you can add the logic to execute the command
-            }
-            else
-            {
-                Console.WriteLine($"Command '{input}' is invalid. Please check your input.");
+                string input = Console.ReadLine()?.ToLower();
+
+                if (input == "exit")
+                    break; // Exit the program
+
+                // Process the command and change the state accordingly
+                if (ProcessCommand(input, validCommands, ref currentState))
+                {
+                    Console.WriteLine($"Current State: {currentState}");
+                }
+                else
+                {
+                    Console.WriteLine($"Invalid command. Please use the correct syntax (e.g., Start Right).");
+                }
             }
         }
 
-        static bool IsValidCommand(string command, HashSet<string> validCommands)
+        static bool ProcessCommand(string command, HashSet<string> validCommands, ref ToyCarState currentState)
         {
             if (string.IsNullOrWhiteSpace(command))
                 return false;
 
             string[] parts = command.Split(' ');
+
             foreach (var part in parts)
             {
-                if (!validCommands.Contains(part) && part != "right")
-                    return false;
+                if (!validCommands.Contains(part))
+                {
+                    return false; // Invalid command
+                }
+
+                // State transitions based on the command
+                switch (part)
+                {
+                    case "start":
+                        if (currentState == ToyCarState.Off)
+                        {
+                            currentState = ToyCarState.Running;
+                            Console.WriteLine("Car started.");
+                        }
+                        break;
+
+                    case "stop":
+                        if (currentState == ToyCarState.Running || currentState == ToyCarState.Accelerating)
+                        {
+                            currentState = ToyCarState.Stopped;
+                            Console.WriteLine("Car stopped.");
+                        }
+                        break;
+
+                    case "accelerate":
+                        if (currentState == ToyCarState.Running)
+                        {
+                            currentState = ToyCarState.Accelerating;
+                            Console.WriteLine("Car is accelerating.");
+                        }
+                        break;
+
+                    case "brake":
+                        if (currentState == ToyCarState.Accelerating)
+                        {
+                            currentState = ToyCarState.Stopped;
+                            Console.WriteLine("Car is braking.");
+                        }
+                        break;
+
+                    case "left":
+                    case "right":
+                    case "forward":
+                    case "backward":
+                        if (currentState == ToyCarState.Running || currentState == ToyCarState.Accelerating)
+                        {
+                            Console.WriteLine($"Car turned {part}.");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Car is off. Please start the car first.");
+                        }
+                        break;
+
+                    default:
+                        return false; // Invalid command
+                }
             }
 
-            return true;
+            return true; // Command processed successfully
         }
     }
 }
