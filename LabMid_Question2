@@ -6,11 +6,17 @@ class Program
 {
     static void Main(string[] args)
     {
-        // Use your name and registration number
-        string firstName = "Hammad";
-        string lastName = "Haider"; // Change this to your actual last name if different
-        string regNumber = "036";
+        // Ask the user for their first name, second name (last name), and role number
+        Console.Write("Enter your first name: ");
+        string firstName = Console.ReadLine();
 
+        Console.Write("Enter your last name: ");
+        string lastName = Console.ReadLine();
+
+        Console.Write("Enter your registration number: ");
+        string regNumber = Console.ReadLine();
+
+        // Generate the password based on the provided details
         string password = GeneratePassword(firstName, lastName, regNumber);
         Console.WriteLine($"Generated Password: {password}");
     }
