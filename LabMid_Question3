@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace ToyCarCommands
 {
@@ -15,6 +15,7 @@ namespace ToyCarCommands
                 // Check for exit command
                 if (input.Equals("Exit", StringComparison.OrdinalIgnoreCase))
                 {
+                    Console.WriteLine("Exiting...");
                     break; // Exit the loop
                 }
 
@@ -37,24 +38,26 @@ namespace ToyCarCommands
                 // Validate the command based on the CFG
                 if (IsValidCommand(cmd, action))
                 {
-                    return "Command is valid!";
+                    return $"Command '{cmd} {action}' is valid!";
                 }
             }
 
-            return "Invalid command. Please use the correct syntax (e.g., Start Right).";
+            return "Invalid command. Please use the correct syntax (e.g., Start Right, Stop Forward).";
         }
 
         static bool IsValidCommand(string cmd, string action)
         {
             // Define valid commands and actions
             string[] validCommands = { "Start", "Stop", "Accelerate", "Brake" };
-            string[] validActions = { "Right" }; // Note: 'Left' is not executed
+            string[] validActions = { "Right", "Left", "Forward", "Back" };
 
             // Check if the command is valid
             bool isCmdValid = Array.Exists(validCommands, c => c.Equals(cmd, StringComparison.OrdinalIgnoreCase));
+
+            // Check if the action is valid (if an action is provided)
             bool isActionValid = action != null && Array.Exists(validActions, a => a.Equals(action, StringComparison.OrdinalIgnoreCase));
 
-            // Return true if the command is valid, action is either valid or null
+            // Return true if the command is valid, and the action is either valid or null
             return isCmdValid && (action == null || isActionValid);
         }
     }
