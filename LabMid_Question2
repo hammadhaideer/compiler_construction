@@ -2,62 +2,84 @@ using System;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace PasswordGenerator
+class Program
 {
-    class Program
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
-        {
-            string registrationNumber = "21";
-            string firstName = "Hammad";
-            string lastName = "Haider";
-            string favoriteMovie = "Inception";
+        // Use your name and registration number
+        string firstName = "Hammad";
+        string lastName = "Haider"; // Change this to your actual last name if different
+        string regNumber = "036";
 
-            string password = GeneratePassword(registrationNumber, firstName, lastName, favoriteMovie);
-            Console.WriteLine("Generated Password: " + password);
+        string password = GeneratePassword(firstName, lastName, regNumber);
+        Console.WriteLine($"Generated Password: {password}");
+    }
+
+    static string GeneratePassword(string firstName, string lastName, string regNumber)
+    {
+        // Extract letters
+        char firstLetterFirstName = firstName[0];
+        char lastLetterFirstName = firstName[firstName.Length - 1];
+
+        // Extract second letters
+        char secondLetterFirstName = firstName.Length > 1 ? firstName[1] : 'A'; // Default to 'A'
+        char secondLetterLastName = lastName.Length > 1 ? lastName[1] : 'A';   // Default to 'A'
+
+        // Generate password components
+        StringBuilder passwordBuilder = new StringBuilder();
+        passwordBuilder.Append(regNumber);                         // 1. Registration number
+        passwordBuilder.Append(firstLetterFirstName);             // 2. First letter of first name
+        passwordBuilder.Append(lastLetterFirstName);              // 2. Last letter of first name
+        passwordBuilder.Append(secondLetterFirstName);            // 3. Second letter of first name
+        passwordBuilder.Append(secondLetterLastName);             // 3. Second letter of last name
+
+        // Add random special characters
+        passwordBuilder.Append(GetRandomSpecialCharacters(2));     // 5. Special characters
+
+        // Ensure password has at least 14 characters and does not contain '#'
+        string password = passwordBuilder.ToString();
+
+        if (password.Length < 14)
+        {
+            password += GetRandomAlphabets(14 - password.Length); // Fill remaining characters
         }
 
-        static string GeneratePassword(string regNumber, string firstName, string lastName, string favoriteMovie)
+        // Check if it meets all criteria
+        return ValidatePassword(password) ? password : "Failed to generate a valid password.";
+    }
+
+    static string GetRandomSpecialCharacters(int count)
+    {
+        const string specialChars = "!@#$%^&*()-_=+[]{}|;:',.<>?";
+        Random random = new Random();
+        StringBuilder specialCharacters = new StringBuilder();
+
+        for (int i = 0; i < count; i++)
         {
-            string firstInitial = firstName.Length >= 2 ? firstName[1].ToString() : "";
-            string lastInitial = lastName.Length >= 2 ? lastName[1].ToString() : "";
-            string moviePart = favoriteMovie.Length >= 2 ? favoriteMovie.Substring(0, 2) : "";
-            string specialChars = "!@$%^&*()-_=+<>?";
-
-            StringBuilder passwordBuilder = new StringBuilder();
-            passwordBuilder.Append(regNumber);
-            passwordBuilder.Append(firstInitial);
-            passwordBuilder.Append(lastInitial);
-            passwordBuilder.Append(moviePart);
-
-            Random random = new Random();
-            while (passwordBuilder.Length < 12)
-            {
-                passwordBuilder.Append((char)('a' + random.Next(0, 26)));
-            }
-            passwordBuilder.Append(specialChars[random.Next(specialChars.Length)]);
-            passwordBuilder.Append(specialChars[random.Next(specialChars.Length)]);
-
-            string password = Shuffle(passwordBuilder.ToString());
-
-            Regex regex = new Regex(@"^(?=.*\d{2})(?=.*[^\w#]).{14}$");
-            if (regex.IsMatch(password))
-                return password;
-
-            return GeneratePassword(regNumber, firstName, lastName, favoriteMovie);
+            specialCharacters.Append(specialChars[random.Next(specialChars.Length)]);
         }
 
-        static string Shuffle(string input)
+        return specialCharacters.ToString();
+    }
+
+    static string GetRandomAlphabets(int count)
+    {
+        const string alphabets = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        Random random = new Random();
+        StringBuilder randomAlphabets = new StringBuilder();
+
+        for (int i = 0; i < count; i++)
         {
-            char[] array = input.ToCharArray();
-            Random random = new Random();
-            int n = array.Length;
-            for (int i = n - 1; i > 0; i--)
-            {
-                int j = random.Next(i + 1);
-                (array[i], array[j]) = (array[j], array[i]);
-            }
-            return new string(array);
+            randomAlphabets.Append(alphabets[random.Next(alphabets.Length)]);
         }
+
+        return randomAlphabets.ToString();
+    }
+
+    static bool ValidatePassword(string password)
+    {
+        // Regex conditions
+        string pattern = @"^(?=.*[a-zA-Z])(?=.*[!@#$%^&*()\-_=+[\]{}|;:',.<>?])[^\#]{14,}$";
+        return Regex.IsMatch(password, pattern);
     }
 }
