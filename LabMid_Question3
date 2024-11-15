@@ -1,127 +1,61 @@
-using System;
-using System.Collections.Generic;
+﻿using System;
 
-namespace ToyCarController
+namespace ToyCarCommands
 {
-    // Define the states for the Toy Car
-    public enum ToyCarState
-    {
-        Off,
-        Running,
-        Accelerating,
-        Braking,
-        Stopped
-    }
-
     class Program
     {
         static void Main(string[] args)
         {
-            // Define valid commands
-            HashSet<string> validCommands = new HashSet<string>
-            {
-                "start",
-                "stop",
-                "accelerate",
-                "brake",
-                "left",
-                "right",
-                "forward",
-                "backward"
-            };
-
-            ToyCarState currentState = ToyCarState.Off; // Initial state
-
             Console.WriteLine("Enter a command for the toy car (e.g., Start Right). Type 'Exit' to quit.");
 
             while (true)
             {
-                string input = Console.ReadLine()?.ToLower();
+                string input = Console.ReadLine();
 
-                if (input == "exit")
-                    break; // Exit the program
+                // Check for exit command
+                if (input.Equals("Exit", StringComparison.OrdinalIgnoreCase))
+                {
+                    break; // Exit the loop
+                }
 
-                // Process the command and change the state accordingly
-                if (ProcessCommand(input, validCommands, ref currentState))
-                {
-                    Console.WriteLine($"Current State: {currentState}");
-                }
-                else
-                {
-                    Console.WriteLine($"Invalid command. Please use the correct syntax (e.g., Start Right).");
-                }
+                string result = ParseCommand(input);
+                Console.WriteLine(result);
             }
         }
 
-        static bool ProcessCommand(string command, HashSet<string> validCommands, ref ToyCarState currentState)
+        static string ParseCommand(string command)
         {
-            if (string.IsNullOrWhiteSpace(command))
-                return false;
+            // Split the command into parts
+            string[] parts = command.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-            string[] parts = command.Split(' ');
-
-            foreach (var part in parts)
+            // Check if the command has at least one part (for the command) and one part (for the action)
+            if (parts.Length >= 1)
             {
-                if (!validCommands.Contains(part))
+                string cmd = parts[0];
+                string action = parts.Length > 1 ? parts[1] : null; // Check if action is provided
+
+                // Validate the command based on the CFG
+                if (IsValidCommand(cmd, action))
                 {
-                    return false; // Invalid command
-                }
-
-                // State transitions based on the command
-                switch (part)
-                {
-                    case "start":
-                        if (currentState == ToyCarState.Off)
-                        {
-                            currentState = ToyCarState.Running;
-                            Console.WriteLine("Car started.");
-                        }
-                        break;
-
-                    case "stop":
-                        if (currentState == ToyCarState.Running || currentState == ToyCarState.Accelerating)
-                        {
-                            currentState = ToyCarState.Stopped;
-                            Console.WriteLine("Car stopped.");
-                        }
-                        break;
-
-                    case "accelerate":
-                        if (currentState == ToyCarState.Running)
-                        {
-                            currentState = ToyCarState.Accelerating;
-                            Console.WriteLine("Car is accelerating.");
-                        }
-                        break;
-
-                    case "brake":
-                        if (currentState == ToyCarState.Accelerating)
-                        {
-                            currentState = ToyCarState.Stopped;
-                            Console.WriteLine("Car is braking.");
-                        }
-                        break;
-
-                    case "left":
-                    case "right":
-                    case "forward":
-                    case "backward":
-                        if (currentState == ToyCarState.Running || currentState == ToyCarState.Accelerating)
-                        {
-                            Console.WriteLine($"Car turned {part}.");
-                        }
-                        else
-                        {
-                            Console.WriteLine("Car is off. Please start the car first.");
-                        }
-                        break;
-
-                    default:
-                        return false; // Invalid command
+                    return "Command is valid!";
                 }
             }
 
-            return true; // Command processed successfully
+            return "Invalid command. Please use the correct syntax (e.g., Start Right).";
+        }
+
+        static bool IsValidCommand(string cmd, string action)
+        {
+            // Define valid commands and actions
+            string[] validCommands = { "Start", "Stop", "Accelerate", "Brake" };
+            string[] validActions = { "Right" }; // Note: 'Left' is not executed
+
+            // Check if the command is valid
+            bool isCmdValid = Array.Exists(validCommands, c => c.Equals(cmd, StringComparison.OrdinalIgnoreCase));
+            bool isActionValid = action != null && Array.Exists(validActions, a => a.Equals(action, StringComparison.OrdinalIgnoreCase));
+
+            // Return true if the command is valid, action is either valid or null
+            return isCmdValid && (action == null || isActionValid);
         }
     }
 }
